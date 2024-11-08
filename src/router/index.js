@@ -1,19 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
+import DashBoard from '../views/DashboardView.vue'
+import UsuariosView from '@/views/UsuariosView.vue'
+import PacientesView from '@/views/PacientesView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'Login',
+    component: LoginView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/inicio',
+    name: 'Dashboard',
+    component: DashBoard,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/usuarios',
+    name: 'Usuarios',
+    component: UsuariosView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/pacientes',
+    name: 'Pacientes',
+    component: PacientesView,
+    meta: { requiresAuth: true } // Requiere autenticación
   }
 ]
 
@@ -21,5 +34,21 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+// Guardia de navegación global
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('auth_token'); // Verifica si hay token en el localStorage
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Si la ruta requiere autenticación y no está autenticado, redirige al Login
+    next({ name: 'Login' });
+  } else if (to.name === 'Login' && isAuthenticated) {
+    // Si intenta acceder al Login estando autenticado, redirige al Dashboard
+    next({ name: 'Dashboard' });
+  } else {
+    // Permite el acceso a la ruta
+    next();
+  }
+});
 
 export default router
