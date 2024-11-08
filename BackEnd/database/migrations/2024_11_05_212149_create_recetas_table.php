@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('prescripciones', function (Blueprint $table) {
-            $table->id('id_prescripcion');
-            $table->foreignId('historial_id')->nullable()->constrained('historial_medico', 'id_historial')->onDelete('set null');
+        Schema::create('recetas', function (Blueprint $table) {
+            $table->id('id_receta');
+            $table->foreignId('consulta_id')->nullable()->constrained('consultas', 'id_consulta')->onDelete('set null');
             $table->foreignId('medicamento_id')->nullable()->constrained('medicamentos', 'id_medicamento')->onDelete('set null');
             $table->string('dosis_prescrita', 100)->nullable();
             $table->string('duracion', 100)->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prescripciones');
+        Schema::dropIfExists('recetas');
     }
 };

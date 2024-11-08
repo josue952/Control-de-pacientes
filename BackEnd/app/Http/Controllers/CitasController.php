@@ -22,9 +22,18 @@ class CitasController extends Controller
             'hora_cita' => 'required',
             'motivo_consulta' => 'nullable|string|max:255',
             'estado' => 'nullable|in:Pendiente,Completada,Cancelada',
+            'monto_consulta' => 'nullable|numeric|min:0',  // Validación para monto
+            'pagada' => 'nullable|boolean',               // Validación para pagada
         ]);
 
-        $cita = Citas::create($request->all());
+        $citaData = $request->all();
+
+        // Establecer por defecto `pagada` en false si no se proporciona
+        if (!isset($citaData['pagada'])) {
+            $citaData['pagada'] = false;
+        }
+
+        $cita = Citas::create($citaData);
         return response()->json($cita, 201);
     }
 
@@ -54,8 +63,11 @@ class CitasController extends Controller
             'hora_cita' => 'required',
             'motivo_consulta' => 'nullable|string|max:255',
             'estado' => 'nullable|in:Pendiente,Completada,Cancelada',
+            'monto_consulta' => 'nullable|numeric|min:0',  // Validación para monto
+            'pagada' => 'nullable|boolean',               // Validación para pagada
         ]);
 
+        // Actualizar los datos incluyendo `monto_consulta` y `pagada`
         $cita->update($request->all());
         return response()->json($cita);
     }

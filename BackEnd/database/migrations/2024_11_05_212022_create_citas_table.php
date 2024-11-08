@@ -19,6 +19,8 @@ return new class extends Migration
             $table->time('hora_cita');
             $table->string('motivo_consulta', 255)->nullable();
             $table->enum('estado', ['Pendiente', 'Completada', 'Cancelada'])->default('Pendiente');
+            $table->decimal('monto_consulta', 10, 2)->nullable()->comment('Costo de la consulta');
+            $table->boolean('pagada')->default(false)->comment('Indica si la consulta ha sido pagada');
             $table->timestamps();
         });
     }

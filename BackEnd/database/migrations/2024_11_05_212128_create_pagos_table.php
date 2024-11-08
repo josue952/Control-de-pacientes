@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('id_pago');
-            $table->foreignId('paciente_id')->nullable()->constrained('pacientes', 'id_paciente')->onDelete('set null');
+            $table->foreignId('cita_id')->nullable()->constrained('citas', 'id_cita')->onDelete('set null');
             $table->decimal('monto', 10, 2);
             $table->date('fecha_pago');
             $table->timestamps();

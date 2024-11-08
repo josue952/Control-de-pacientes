@@ -5,26 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Prescripciones extends Model
+class Recetas extends Model
 {
     use HasFactory;
 
-    protected $table = 'prescripciones';
+    protected $table = 'recetas';
 
-    protected $primaryKey = 'id_prescripcion';
+    protected $primaryKey = 'id_receta';
 
     protected $fillable = [
-        'historial_id',
+        'consulta_id',
         'medicamento_id',
         'dosis_prescrita',
         'duracion',
     ];
 
-    public function historialMedico()
+    // Relación con la tabla Consultas
+    public function consulta()
     {
-        return $this->belongsTo(Historial_medico::class, 'historial_id', 'id_historial');
+        return $this->belongsTo(Consultas::class, 'consulta_id', 'id_consulta');
     }
 
+    // Relación con la tabla Medicamentos
     public function medicamento()
     {
         return $this->belongsTo(Medicamentos::class, 'medicamento_id', 'id_medicamento');
