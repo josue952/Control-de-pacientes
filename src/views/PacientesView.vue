@@ -55,7 +55,7 @@
                     <v-form ref="form" v-model="valid">
                         <!-- Campo de Usuario (Select de Usuarios con Rol Paciente) -->
                         <v-select :items="usuarios" item-value="id_usuario" item-title="nombre_completo"
-                            label="Seleccione un Usuario" v-model="editedPaciente.usuario_id" required></v-select>
+                            label="Seleccione un Usuario" v-model="editedPaciente.usuario_id" :disabled="editMode" required></v-select>
 
                         <!-- Campo de Fecha de Nacimiento con evento de entrada -->
                         <v-text-field v-model="editedPaciente.fecha_nacimiento" label="Fecha de Nacimiento" type="date"

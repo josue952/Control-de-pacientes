@@ -70,10 +70,6 @@
                             :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                             @click:append="togglePasswordVisibility" :rules="[rules.password]"
                             :required="!editMode"></v-text-field>
-
-                        <!-- Campo de Fecha de Registro -->
-                        <v-text-field v-model="editedUser.Fecha_registro" label="Fecha de registro" type="date"
-                            required></v-text-field>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
@@ -264,7 +260,7 @@ function showAddUserDialog() {
         email: "",
         password: "",
         Rol: "",
-        Fecha_registro: ""
+        Fecha_registro: new Date().toISOString().slice(0, 10) // Asigna la fecha actual en formato "YYYY-MM-DD"
     };
     dialog.value = true;
 }
