@@ -37,7 +37,6 @@ export default {
                 { title: 'Pacientes', icon: 'mdi-account-group', to: '/pacientes' },
                 { title: 'Doctores', icon: 'mdi-doctor', to: '/doctores' },
                 { title: 'Citas', icon: 'mdi-calendar-clock', to: '/citas' },
-                { title: 'Historial', icon: 'mdi-history', to: '/historial' },
                 { title: 'Configuración', icon: 'mdi-cog', to: '/configuracion' },
             ],
         };

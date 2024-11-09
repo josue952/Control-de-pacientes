@@ -59,7 +59,7 @@
                             required>
                         </v-select>
                         <!-- Campo de Teléfono -->
-                        <v-text-field v-model="editedDoctor.telefono" label="Teléfono" type="text"></v-text-field>
+                        <v-text-field v-model="editedDoctor.telefono" label="Teléfono" type="number"></v-text-field>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
