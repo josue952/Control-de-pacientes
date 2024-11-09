@@ -7,9 +7,9 @@ use App\Http\Controllers\PacientesController;
 use App\Http\Controllers\DoctoresController;
 use App\Http\Controllers\CitasController;
 use App\Http\Controllers\PagosController;
-use App\Http\Controllers\ConsultasController; // Añadido controlador de consultas
-use App\Http\Controllers\RecetasController; // Añadido controlador de recetas
-
+use App\Http\Controllers\ConsultasController;
+use App\Http\Controllers\RecetasController;
+use App\Http\Controllers\ExamenesController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -86,6 +86,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [RecetasController::class, 'show']); // Mostrar una receta específica por ID
         Route::put('/{id}', [RecetasController::class, 'update']); // Actualizar una receta específica por ID
         Route::delete('/{id}', [RecetasController::class, 'destroy']); // Eliminar una receta específica por ID
+    });
+
+    // Rutas para Exámenes
+    Route::prefix('examenes')->group(function () {
+        Route::get('/', [ExamenesController::class, 'index']); // Listar todos los exámenes
+        Route::post('/', [ExamenesController::class, 'store']); // Crear un nuevo examen
+        Route::get('/{id}', [ExamenesController::class, 'show']); // Mostrar un examen específico por ID
+        Route::put('/{id}', [ExamenesController::class, 'update']); // Actualizar un examen específico por ID
+        Route::delete('/{id}', [ExamenesController::class, 'destroy']); // Eliminar un examen específico por ID
     });
 
     //Queda pendiente las rutas para medicamentos

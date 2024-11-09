@@ -16,6 +16,7 @@ class Consultas extends Model
         'cita_id',
         'paciente_id',
         'doctor_id',
+        'examen_id', // Referencia opcional a Examenes
         'diagnostico',
         'enfermedad',
         'observaciones',
@@ -38,5 +39,11 @@ class Consultas extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctores::class, 'doctor_id', 'id_doctor');
+    }
+
+    // Relación opcional con la tabla Examenes
+    public function examen()
+    {
+        return $this->belongsTo(Examenes::class, 'examen_id', 'id_examen')->nullable();
     }
 }

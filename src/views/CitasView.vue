@@ -76,7 +76,7 @@
                         <v-text-field v-model="editedCita.motivo_consulta" label="Motivo de Consulta" type="text"></v-text-field>
 
                         <v-select :items="['Pendiente', 'Completada', 'Cancelada']" v-model="editedCita.estado"
-                            label="Estado" required></v-select>
+                            label="Estado" :disabled="!editMode" required></v-select>
 
                         <v-text-field 
                             v-model="editedCita.monto_consulta" 
@@ -84,14 +84,14 @@
                             type="number" 
                             min="0" 
                             required
-                            :disabled="!editMode" 
+                            :disabled="!editMode || editedCita.pagada" 
                             :value="editMode ? editedCita.monto_consulta : 0">
                         </v-text-field>
 
                         <v-switch
                             v-model="editedCita.pagada"
                             label="¿Pagada?"
-                            :disabled="!editMode"
+                            disabled
                             :color="editedCita.pagada ? 'primary' : 'grey'"
                         />
                     </v-form>
@@ -327,9 +327,9 @@ async function saveCita() {
         }
 
         if (editMode.value) {
+            console.log('Cita a actualizar: ', editedCita.value);
             await citasService.actualizarCita(editedCita.value.id_cita, editedCita.value);
         } else {
-            console.log('Cita a guardar:', editedCita.value);
             await citasService.crearCita(editedCita.value);
         }
         closeDialog();

@@ -20,13 +20,16 @@ return new class extends Migration
             // Se captura el paciente y doctor automáticamente de la cita
             $table->foreignId('paciente_id')->constrained('pacientes', 'id_paciente')->onDelete('cascade');
             $table->foreignId('doctor_id')->constrained('doctores', 'id_doctor')->onDelete('cascade');
-            
+        
+            // Relación opcional con la tabla Examenes
+            $table->foreignId('examen_id')->nullable()->constrained('examenes', 'id_examen')->onDelete('set null');
+        
             // Detalles específicos de la consulta
             $table->string('diagnostico', 255);
             $table->string('enfermedad', 255)->nullable();
             $table->text('observaciones')->nullable();
             $table->text('tratamiento')->nullable();
-            
+        
             $table->timestamps();
         });
     }

@@ -37,6 +37,10 @@ export default {
                 { title: 'Pacientes', icon: 'mdi-account-group', to: '/pacientes' },
                 { title: 'Doctores', icon: 'mdi-doctor', to: '/doctores' },
                 { title: 'Citas', icon: 'mdi-calendar-clock', to: '/citas' },
+                { title: 'Pagos', icon: 'mdi-cash', to: '/pagos' },
+                { title: 'Consultas', icon: 'mdi-stethoscope', to: '/consultas' },
+                { title: 'Examenes', icon: 'mdi-test-tube', to: '/examenes' },
+                { title: 'Recetas', icon: 'mdi-file-document', to: '/recetas' },
                 { title: 'Configuración', icon: 'mdi-cog', to: '/configuracion' },
             ],
         };
