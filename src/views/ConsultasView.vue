@@ -4,16 +4,26 @@
         <side-bar :is-mini="isMini" @update:isMini="isMini = $event" />
     </div>
     <v-container class="centered-container content-padding">
-        <!-- Barra superior con botón Agregar -->
+        <!-- Barra superior con botón Agregar y filtros -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="4">
                 <v-btn color="primary" @click="showAddConsultaDialog">Agregar Consulta</v-btn>
             </v-col>
+            <v-col cols="4">
+                <v-select v-model="selectedPaciente" :items="pacientesOptions" label="Filtrar por Paciente"
+                    item-title="pacienteNombre" item-value="paciente_id">
+                </v-select>
+            </v-col>
+            <v-col cols="4">
+                <v-select v-model="selectedDoctor" :items="doctoresOptions" label="Filtrar por Doctor"
+                    item-title="doctorNombre" item-value="doctor_id">
+                </v-select>
+            </v-col>
         </v-row>
 
         <!-- Tabla de consultas -->
-        <v-data-table :headers="tableHeaders" :items="consultas" :items-per-page="10" class="elevation-1 large-table"
-            :footer-props="{ 'items-per-page-options': [10, 20, 30] }">
+        <v-data-table :headers="tableHeaders" :items="filteredConsultas" :items-per-page="10"
+            class="elevation-1 large-table" :footer-props="{ 'items-per-page-options': [10, 20, 30] }">
             <template #item="{ item }">
                 <tr>
                     <td>{{ 'Cita N° ' + item.cita_id }}</td>
@@ -70,7 +80,8 @@
                             <template #item="{ item }">
                                 <div class="d-flex justify-space-between align-center">
                                     <span style="margin-left: 15px;">{{ item.value ? `Examen N° ${item.value}` : "Sin Examen" }}</span>
-                                    <v-icon @click.stop="viewExamenDetails(item.value)" style="margin-right: 15px;">mdi-eye</v-icon>
+                                    <v-icon @click.stop="viewExamenDetails(item.value)"
+                                        style="margin-right: 15px;">mdi-eye</v-icon>
                                 </div>
                             </template>
                         </v-select>
@@ -176,6 +187,12 @@ const citaDetails = ref(null);
 const viewExamenDialog = ref(false); // Controla la visibilidad del diálogo de detalles del examen
 const examenDetails = ref(null); // Almacena los detalles del examen seleccionado
 
+// Variables para filtros
+const selectedPaciente = ref(null); // Almacena el ID del paciente seleccionado
+const selectedDoctor = ref(null); // Almacena el ID del doctor seleccionado
+const pacientesOptions = ref([{ paciente_id: null, pacienteNombre: "Todos" }]); // Lista de pacientes únicos con opción "Todos"
+const doctoresOptions = ref([{ doctor_id: null, doctorNombre: "Todos" }]); // Lista de doctores únicos con opción "Todos"
+
 const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
@@ -192,6 +209,40 @@ const tableHeaders = [
     { title: 'Examen', align: 'start', key: 'examen_id', width: '150px' },
     { title: 'Acciones', align: 'center', key: 'actions', sortable: false, width: '150px' }
 ];
+
+// Función para obtener opciones únicas de pacientes y doctores a partir de las consultas
+function loadFilterOptions() {
+    const pacientesSet = new Set();
+    const doctoresSet = new Set();
+
+    consultas.value.forEach(consulta => {
+        if (consulta.paciente_id && consulta.pacienteNombre) {
+            pacientesSet.add(JSON.stringify({ paciente_id: consulta.paciente_id, pacienteNombre: consulta.pacienteNombre }));
+        }
+        if (consulta.doctor_id && consulta.doctorNombre) {
+            doctoresSet.add(JSON.stringify({ doctor_id: consulta.doctor_id, doctorNombre: consulta.doctorNombre }));
+        }
+    });
+
+    // Convertir Set en Array para los selects y añadir "Todos"
+    pacientesOptions.value = [
+        { paciente_id: null, pacienteNombre: "Todos" },
+        ...Array.from(pacientesSet).map(item => JSON.parse(item))
+    ];
+    doctoresOptions.value = [
+        { doctor_id: null, doctorNombre: "Todos" },
+        ...Array.from(doctoresSet).map(item => JSON.parse(item))
+    ];
+}
+
+// Función que devuelve las consultas filtradas
+const filteredConsultas = computed(() => {
+    return consultas.value.filter(consulta => {
+        const pacienteMatch = selectedPaciente.value ? consulta.paciente_id === selectedPaciente.value : true;
+        const doctorMatch = selectedDoctor.value ? consulta.doctor_id === selectedDoctor.value : true;
+        return pacienteMatch && doctorMatch;
+    });
+});
 
 const canSave = computed(() => {
     const { cita_id, paciente_id, doctor_id, diagnostico, enfermedad, observaciones, tratamiento } = editedConsulta.value;
@@ -311,10 +362,12 @@ async function getCitas() {
     }
 }
 
+// Llama a loadFilterOptions cada vez que se carguen las consultas
 async function getConsultas() {
     try {
         const response = await consultasService.obtenerConsultas();
-        consultas.value = response;  // Asigna la respuesta directamente a consultas
+        consultas.value = response;
+        loadFilterOptions(); // Cargar opciones de filtro después de cargar consultas
         console.log("Consultas cargadas:", consultas.value);
     } catch (error) {
         console.error("Error al cargar consultas:", error);

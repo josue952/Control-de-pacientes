@@ -76,7 +76,7 @@ export default {
                     localStorage.setItem('user_email', this.email);
 
                     // Redirige al usuario al Dashboard
-                    this.$router.push({ name: 'Dashboard' });
+                    this.$router.push({ name: 'Usuarios' });
                 } catch (error) {
                     console.error(error);
                     this.showErrorDialog = true; // Muestra el diálogo de error

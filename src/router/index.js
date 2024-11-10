@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
-import DashBoard from '../views/DashboardView.vue'
 import UsuariosView from '@/views/UsuariosView.vue'
 import PacientesView from '@/views/PacientesView.vue'
 import DoctoresView from '@/views/DoctoresView.vue'
@@ -14,12 +13,6 @@ const routes = [
     path: '/',
     name: 'Login',
     component: LoginView
-  },
-  {
-    path: '/inicio',
-    name: 'Dashboard',
-    component: DashBoard,
-    meta: { requiresAuth: true } // Requiere autenticación
   },
   {
     path: '/usuarios',

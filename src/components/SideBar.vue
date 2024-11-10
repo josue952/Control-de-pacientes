@@ -32,7 +32,6 @@ export default {
             drawerWidth: 190,
             miniDrawerWidth: 70,
             items: [
-                { title: 'Dashboard', icon: 'mdi-view-dashboard', to: '/inicio' },
                 { title: 'Usuarios', icon: 'mdi-account', to: '/usuarios' },
                 { title: 'Pacientes', icon: 'mdi-account-group', to: '/pacientes' },
                 { title: 'Doctores', icon: 'mdi-doctor', to: '/doctores' },
@@ -40,8 +39,8 @@ export default {
                 { title: 'Pagos', icon: 'mdi-cash', to: '/pagos' },
                 { title: 'Consultas', icon: 'mdi-stethoscope', to: '/consultas' },
                 { title: 'Examenes', icon: 'mdi-test-tube', to: '/examenes' },
+                { title: 'Medicamentos', icon: 'mdi-pill', to: '/medicamentos' },
                 { title: 'Recetas', icon: 'mdi-file-document', to: '/recetas' },
-                { title: 'Configuración', icon: 'mdi-cog', to: '/configuracion' },
             ],
         };
     },
