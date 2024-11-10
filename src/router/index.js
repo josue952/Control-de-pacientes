@@ -7,6 +7,7 @@ import DoctoresView from '@/views/DoctoresView.vue'
 import CitasView from '@/views/CitasView.vue'
 import ExamenesView from '@/views/ExamenesView.vue'
 import PagosView from '@/views/PagosView.vue'
+import ConsultasView from '@/views/ConsultasView.vue'
 
 const routes = [
   {
@@ -54,6 +55,12 @@ const routes = [
     path: '/pagos',
     name: 'Pagos',
     component: PagosView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/consultas',
+    name: 'Consultas',
+    component: ConsultasView,
     meta: { requiresAuth: true } // Requiere autenticación
   }
 ]

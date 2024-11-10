@@ -53,7 +53,7 @@
                             item-value="id_cita">
                             <template #item="{ item }">
                                 <div class="d-flex justify-space-between align-center">
-                                    <span>{{ 'Cita N° ' + item.value }}</span>
+                                    <span style="margin-left: 15px;">{{ 'Cita N° ' + item.value }}</span>
                                     <v-icon @click.stop="viewCitaDetails(item.value)"
                                         style="margin-right: 15px;">mdi-eye</v-icon>
                                 </div>
