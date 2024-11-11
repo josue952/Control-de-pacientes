@@ -3,7 +3,7 @@
         <v-divider></v-divider>
 
         <v-list dense>
-            <v-list-item v-for="item in items" :key="item.title" :to="item.to" link>
+            <v-list-item v-for="item in items" :key="item.title" :to="item.to" link @click="toggleSubMenu(item)">
                 <div class="list-item-content">
                     <v-list-item-icon class="icon-with-margin">
                         <v-icon>{{ item.icon }}</v-icon>
@@ -13,6 +13,20 @@
                     </v-list-item-content>
                 </div>
             </v-list-item>
+
+            <!-- Submenú de Reportes -->
+            <v-list v-if="showReportsSubMenu" class="sub-menu" dense>
+                <v-list-item v-for="subItem in reportItems" :key="subItem.title" :to="subItem.to" link>
+                    <div class="list-item-content">
+                        <v-list-item-icon class="icon-with-margin">
+                            <v-icon>{{ subItem.icon }}</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content v-if="!isMini">
+                            <v-list-item-title>{{ subItem.title }}</v-list-item-title>
+                        </v-list-item-content>
+                    </div>
+                </v-list-item>
+            </v-list>
         </v-list>
     </v-navigation-drawer>
 </template>
@@ -31,6 +45,7 @@ export default {
             drawer: true,
             drawerWidth: 190,
             miniDrawerWidth: 70,
+            showReportsSubMenu: false, // Controla la visibilidad del submenú de reportes
             items: [
                 { title: 'Usuarios', icon: 'mdi-account', to: '/usuarios' },
                 { title: 'Pacientes', icon: 'mdi-account-group', to: '/pacientes' },
@@ -41,7 +56,14 @@ export default {
                 { title: 'Examenes', icon: 'mdi-test-tube', to: '/examenes' },
                 { title: 'Medicamentos', icon: 'mdi-pill', to: '/medicamentos' },
                 { title: 'Recetas', icon: 'mdi-file-document', to: '/recetas' },
+                { title: 'Reportes', icon: 'mdi-chart-bar', to: null } // Nuevo ítem de "Reportes"
             ],
+            reportItems: [ // Subreportes dentro de Reportes
+                { title: 'Paciente', icon: 'mdi-file-chart', to: '/reportes/usuarios' },
+                { title: 'Recetas', icon: 'mdi-file-chart', to: '/reportes/pacientes' },
+                { title: 'Examenes', icon: 'mdi-file-chart', to: '/reportes/doctores' },
+                { title: 'Consultas', icon: 'mdi-file-chart', to: '/reportes/citas' }
+            ]
         };
     },
     computed: {
@@ -56,6 +78,11 @@ export default {
         updateMiniVariant(value) {
             this.$emit('update:isMini', value);
         },
+        toggleSubMenu(item) {
+            if (item.title === 'Reportes') {
+                this.showReportsSubMenu = !this.showReportsSubMenu; // Toggle del submenú de reportes
+            }
+        }
     },
     watch: {
         drawer(val) {
@@ -70,10 +97,14 @@ export default {
 <style scoped>
 .list-item-content {
     display: flex;
-    align-items: center; /* Alinea el icono y el título en la misma línea */
+    align-items: center;
 }
 
 .icon-with-margin {
-    margin-right: 12px; /* Espacio entre el ícono y el título */
+    margin-right: 12px;
+}
+
+.sub-menu {
+    padding-left: 20px; /* Aumenta el margen para indicar que es un submenú */
 }
 </style>
