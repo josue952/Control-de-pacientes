@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_receta');
             $table->foreignId('consulta_id')->nullable()->constrained('consultas', 'id_consulta')->onDelete('set null');
             $table->foreignId('medicamento_id')->nullable()->constrained('medicamentos', 'id_medicamento')->onDelete('set null');
+            $table->integer('cantidad')->nullable();
             $table->string('dosis_prescrita', 100)->nullable();
             $table->string('duracion', 100)->nullable();
             $table->timestamps();

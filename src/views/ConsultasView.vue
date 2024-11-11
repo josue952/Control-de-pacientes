@@ -132,7 +132,6 @@
                     <span class="headline">Detalles del Examen</span>
                 </v-card-title>
                 <v-card-text>
-                    <p><strong>ID del Examen:</strong> {{ examenDetails?.id_examen || "N/A" }}</p>
                     <p><strong>Nombre:</strong> {{ examenDetails?.nombre || "N/A" }}</p>
                     <p><strong>Descripción:</strong> {{ examenDetails?.descripcion || "N/A" }}</p>
                     <p><strong>Fecha del examen:</strong> {{ examenDetails?.fecha_examen || "N/A" }}</p>

@@ -10,6 +10,7 @@ use App\Http\Controllers\PagosController;
 use App\Http\Controllers\ConsultasController;
 use App\Http\Controllers\RecetasController;
 use App\Http\Controllers\ExamenesController;
+use App\Http\Controllers\MedicamentosController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -97,5 +98,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [ExamenesController::class, 'destroy']); // Eliminar un examen específico por ID
     });
 
-    //Queda pendiente las rutas para medicamentos
+    // Rutas para Medicamentos
+    Route::prefix('medicamentos')->group(function () {
+    Route::get('/', [MedicamentosController::class, 'index']); // Listar todos los medicamentos
+    Route::post('/', [MedicamentosController::class, 'store']); // Crear un nuevo medicamento
+    Route::get('/{id}', [MedicamentosController::class, 'show']); // Mostrar un medicamento específico por ID
+    Route::put('/{id}', [MedicamentosController::class, 'update']); // Actualizar un medicamento específico por ID
+    Route::delete('/{id}', [MedicamentosController::class, 'destroy']); // Eliminar un medicamento específico por ID
+});
 });

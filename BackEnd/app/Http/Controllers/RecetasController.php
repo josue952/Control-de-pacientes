@@ -2,69 +2,153 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Recetas;
+use App\Models\Medicamentos;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class RecetasController extends Controller
 {
+    // Listar todas las recetas
     public function index()
     {
-        $recetas = Recetas::with(['consulta', 'medicamento'])->get();
-        return response()->json($recetas);
+        try {
+            $recetas = Recetas::with(['consulta', 'medicamento'])->get();
+            return response()->json($recetas);
+        } catch (\Exception $e) {
+            Log::error('Error al listar recetas: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al listar recetas'], 500);
+        }
     }
 
+    // Crear una nueva receta
     public function store(Request $request)
     {
-        $request->validate([
-            'consulta_id' => 'nullable|exists:consultas,id_consulta',
-            'medicamento_id' => 'nullable|exists:medicamentos,id_medicamento',
-            'dosis_prescrita' => 'nullable|string',
-            'duracion' => 'nullable|string',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'consulta_id' => 'nullable|exists:consultas,id_consulta',
+                'medicamento_id' => 'nullable|exists:medicamentos,id_medicamento',
+                'cantidad' => 'required|integer|min:1',
+                'dosis_prescrita' => 'nullable|string|max:100',
+                'duracion' => 'nullable|string|max:100',
+            ]);
 
-        $receta = Recetas::create($request->all());
-        return response()->json($receta, 201);
+            $medicamento = Medicamentos::find($validatedData['medicamento_id']);
+            
+            if (!$medicamento) {
+                return response()->json(['message' => 'Medicamento no encontrado'], 404);
+            }
+
+            // Validar que la cantidad no exceda el stock disponible
+            if ($validatedData['cantidad'] > $medicamento->cantidad) {
+                return response()->json(['message' => 'La cantidad de medicamentos supera al stock actual, elija una cantidad adecuada'], 422);
+            }
+
+            // Restar la cantidad solicitada del stock del medicamento
+            $medicamento->cantidad -= $validatedData['cantidad'];
+            $medicamento->save();
+
+            $receta = Recetas::create($validatedData);
+
+            return response()->json(['message' => 'Receta creada exitosamente', 'receta' => $receta], 201);
+        } catch (ValidationException $e) {
+            Log::error('Error de validación al crear receta: ' . json_encode($e->errors()));
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Error al crear receta: ' . $e->getMessage());
+            return response()->json(['message' => 'Error inesperado al crear receta'], 500);
+        }
     }
 
+    // Mostrar una receta específica
     public function show($id)
     {
-        $receta = Recetas::with(['consulta', 'medicamento'])->find($id);
+        try {
+            $receta = Recetas::with(['consulta', 'medicamento'])->find($id);
 
-        if (!$receta) {
-            return response()->json(['message' => 'Receta no encontrada'], 404);
+            if (!$receta) {
+                return response()->json(['message' => 'Receta no encontrada'], 404);
+            }
+
+            return response()->json($receta);
+        } catch (\Exception $e) {
+            Log::error('Error al mostrar receta: ' . $e->getMessage());
+            return response()->json(['message' => 'Error inesperado al mostrar receta'], 500);
         }
-
-        return response()->json($receta);
     }
 
+    // Actualizar una receta específica
     public function update(Request $request, $id)
     {
-        $receta = Recetas::find($id);
+        try {
+            $receta = Recetas::find($id);
 
-        if (!$receta) {
-            return response()->json(['message' => 'Receta no encontrada'], 404);
+            if (!$receta) {
+                return response()->json(['message' => 'Receta no encontrada'], 404);
+            }
+
+            $validatedData = $request->validate([
+                'consulta_id' => 'nullable|exists:consultas,id_consulta',
+                'medicamento_id' => 'nullable|exists:medicamentos,id_medicamento',
+                'cantidad' => 'required|integer|min:1',
+                'dosis_prescrita' => 'nullable|string|max:100',
+                'duracion' => 'nullable|string|max:100',
+            ]);
+
+            $medicamento = Medicamentos::find($validatedData['medicamento_id']);
+
+            if (!$medicamento) {
+                return response()->json(['message' => 'Medicamento no encontrado'], 404);
+            }
+
+            // Ajustar el stock según la nueva cantidad en la receta
+            $diferenciaCantidad = $validatedData['cantidad'] - $receta->cantidad;
+            if ($diferenciaCantidad > $medicamento->cantidad) {
+                return response()->json(['message' => 'La cantidad de medicamentos supera al stock actual, elija una cantidad adecuada'], 422);
+            }
+
+            // Actualizar el stock del medicamento
+            $medicamento->cantidad -= $diferenciaCantidad;
+            $medicamento->save();
+
+            // Actualizar la receta con los nuevos datos
+            $receta->update($validatedData);
+
+            return response()->json(['message' => 'Receta actualizada exitosamente', 'receta' => $receta]);
+        } catch (ValidationException $e) {
+            Log::error('Error de validación al actualizar receta: ' . json_encode($e->errors()));
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar receta: ' . $e->getMessage());
+            return response()->json(['message' => 'Error inesperado al actualizar receta'], 500);
         }
-
-        $request->validate([
-            'consulta_id' => 'nullable|exists:consultas,id_consulta',
-            'medicamento_id' => 'nullable|exists:medicamentos,id_medicamento',
-            'dosis_prescrita' => 'nullable|string',
-            'duracion' => 'nullable|string',
-        ]);
-
-        $receta->update($request->all());
-        return response()->json($receta);
     }
 
+    // Eliminar una receta específica
     public function destroy($id)
     {
-        $receta = Recetas::find($id);
+        try {
+            $receta = Recetas::find($id);
 
-        if (!$receta) {
-            return response()->json(['message' => 'Receta no encontrada'], 404);
+            if (!$receta) {
+                return response()->json(['message' => 'Receta no encontrada'], 404);
+            }
+
+            $medicamento = Medicamentos::find($receta->medicamento_id);
+
+            if ($medicamento) {
+                // Devolver la cantidad al stock del medicamento
+                $medicamento->cantidad += $receta->cantidad;
+                $medicamento->save();
+            }
+
+            $receta->delete();
+
+            return response()->json(['message' => 'Receta eliminada exitosamente']);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar receta: ' . $e->getMessage());
+            return response()->json(['message' => 'Error inesperado al eliminar receta'], 500);
         }
-
-        $receta->delete();
-        return response()->json(['message' => 'Receta eliminada con éxito']);
     }
 }

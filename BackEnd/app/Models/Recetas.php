@@ -16,17 +16,16 @@ class Recetas extends Model
     protected $fillable = [
         'consulta_id',
         'medicamento_id',
+        'cantidad',
         'dosis_prescrita',
         'duracion',
     ];
 
-    // Relación con la tabla Consultas
     public function consulta()
     {
         return $this->belongsTo(Consultas::class, 'consulta_id', 'id_consulta');
     }
 
-    // Relación con la tabla Medicamentos
     public function medicamento()
     {
         return $this->belongsTo(Medicamentos::class, 'medicamento_id', 'id_medicamento');

@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('medicamentos', function (Blueprint $table) {
             $table->id('id_medicamento');
-            $table->string('nombre', 100);
+            $table->string('nombre', 100)->unique();
             $table->text('descripcion')->nullable();
+            $table->integer('cantidad')->nullable();
             $table->string('dosis', 100)->nullable();
             $table->timestamp('fecha_registro')->useCurrent();
             $table->timestamps();
