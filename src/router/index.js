@@ -1,19 +1,74 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
+import UsuariosView from '@/views/UsuariosView.vue'
+import PacientesView from '@/views/PacientesView.vue'
+import DoctoresView from '@/views/DoctoresView.vue'
+import CitasView from '@/views/CitasView.vue'
+import ExamenesView from '@/views/ExamenesView.vue'
+import PagosView from '@/views/PagosView.vue'
+import ConsultasView from '@/views/ConsultasView.vue'
+import MedicamentosView from '@/views/MedicamentosView.vue'
+import RecetasView from '@/views/RecetasView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'Login',
+    component: LoginView
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/usuarios',
+    name: 'Usuarios',
+    component: UsuariosView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/pacientes',
+    name: 'Pacientes',
+    component: PacientesView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/doctores',
+    name: 'Doctores',
+    component: DoctoresView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/citas',
+    name: 'Citas',
+    component: CitasView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/examenes',
+    name: 'Examenes',
+    component: ExamenesView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/pagos',
+    name: 'Pagos',
+    component: PagosView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/consultas',
+    name: 'Consultas',
+    component: ConsultasView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/medicamentos',
+    name: 'Medicamentos',
+    component: MedicamentosView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/recetas',
+    name: 'Recetas',
+    component: RecetasView,
+    meta: { requiresAuth: true } // Requiere autenticación
   }
 ]
 
@@ -21,5 +76,21 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+// Guardia de navegación global
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('auth_token'); // Verifica si hay token en el localStorage
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Si la ruta requiere autenticación y no está autenticado, redirige al Login
+    next({ name: 'Login' });
+  } else if (to.name === 'Login' && isAuthenticated) {
+    // Si intenta acceder al Login estando autenticado, redirige al Dashboard
+    next({ name: 'Dashboard' });
+  } else {
+    // Permite el acceso a la ruta
+    next();
+  }
+});
 
 export default router
