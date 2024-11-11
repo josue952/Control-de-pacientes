@@ -4,20 +4,20 @@
         <side-bar :is-mini="isMini" @update:isMini="isMini = $event" />
     </div>
     <v-container class="centered-container content-padding">
-        <!-- Barra superior con selector de paciente y botón para generar reporte -->
+        <!-- Barra superior con selector de doctor y botón para generar reporte -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="8">
                 <v-select 
-                    v-model="selectedPatient"
-                    :items="patientsOptions"
-                    label="Seleccionar Paciente para Reporte"
-                    item-title="pacienteNombre"
-                    item-value="paciente_id"
+                    v-model="selectedDoctor"
+                    :items="doctorsOptions"
+                    label="Seleccionar Doctor para Reporte"
+                    item-title="doctorNombre"
+                    item-value="doctor_id"
                     outlined
                 ></v-select>
             </v-col>
             <v-col cols="4">
-                <v-btn color="primary" @click="generatePatientReport" :disabled="!selectedPatient">
+                <v-btn color="primary" @click="generateDoctorReport" :disabled="!selectedDoctor">
                     Generar Reporte
                 </v-btn>
             </v-col>
@@ -26,7 +26,7 @@
         <!-- Modal para mostrar el PDF -->
         <v-dialog v-model="showPdfDialog" max-width="1200px">
             <v-card>
-                <v-card-title class="headline">Expediente Médico</v-card-title>
+                <v-card-title class="headline">Reporte de Consultas por Doctor</v-card-title>
                 <v-card-text>
                     <iframe
                         v-if="pdfUrl"
@@ -49,39 +49,39 @@
 import { ref, onMounted } from 'vue';
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SideBar from "@/components/SideBar.vue";
-import pacientesService from "@/services/pacientesService";
+import doctoresService from "@/services/doctoresService"; // Servicio de doctores
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
 const isMini = ref(true);
-const patientsOptions = ref([]);
-const selectedPatient = ref(null); // Almacena el ID del paciente seleccionado
+const doctorsOptions = ref([]); // Opciones para seleccionar doctores
+const selectedDoctor = ref(null); // ID del doctor seleccionado
 const pdfUrl = ref(null); // URL temporal para el PDF
 const showPdfDialog = ref(false); // Controla la visibilidad del modal
 
-// Cargar la lista de pacientes
-async function loadPatients() {
+// Cargar la lista de doctores
+async function loadDoctors() {
     try {
-        const response = await pacientesService.obtenerPacientes();
-        patientsOptions.value = response.map(paciente => ({
-            paciente_id: paciente.id_paciente, 
-            pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre'
+        const response = await doctoresService.obtenerDoctores(); // Llama al servicio para obtener los doctores
+        doctorsOptions.value = response.map(doctor => ({
+            doctor_id: doctor.id_doctor, 
+            doctorNombre: doctor.usuario?.nombre_completo || 'Sin nombre'
         }));
     } catch (error) {
-        console.error("Error al cargar pacientes:", error);
+        console.error("Error al cargar doctores:", error);
     }
 }
 
-// Función para generar el reporte del paciente seleccionado
-async function generatePatientReport() {
-    if (!selectedPatient.value) {
-        alert("Seleccione un paciente");
+// Función para generar el reporte del doctor seleccionado
+async function generateDoctorReport() {
+    if (!selectedDoctor.value) {
+        alert("Seleccione un doctor");
         return;
     }
 
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/reportes/expediente/${selectedPatient.value}`, {
+        const response = await axios.get(`http://127.0.0.1:8000/api/reportes/consultas/doctor/${selectedDoctor.value}`, {
             responseType: 'blob' // Recibir el archivo PDF como blob
         });
 
@@ -92,15 +92,15 @@ async function generatePatientReport() {
         showPdfDialog.value = true;
     } catch (error) {
         console.error("Error al generar reporte:", error);
-        alert("Error al generar el reporte del paciente.");
+        alert("Error al generar el reporte de consultas del doctor.");
     }
 }
 
-// Cargar pacientes al montar el componente
+// Cargar doctores al montar el componente
 onMounted(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-        loadPatients(); // Cargar los pacientes cuando se monta el componente
+        loadDoctors(); // Cargar los doctores cuando se monta el componente
     } else {
         router.push({ name: 'Login' });
     }

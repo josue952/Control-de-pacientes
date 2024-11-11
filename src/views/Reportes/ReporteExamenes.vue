@@ -4,10 +4,10 @@
         <side-bar :is-mini="isMini" @update:isMini="isMini = $event" />
     </div>
     <v-container class="centered-container content-padding">
-        <!-- Barra superior con selector de paciente y botón para generar reporte -->
+        <!-- Barra superior con selector de paciente, rango de fechas y botón para generar reporte -->
         <v-row class="d-flex align-center mb-4 mt-4">
-            <v-col cols="8">
-                <v-select 
+            <v-col cols="4">
+                <v-select
                     v-model="selectedPatient"
                     :items="patientsOptions"
                     label="Seleccionar Paciente para Reporte"
@@ -16,8 +16,24 @@
                     outlined
                 ></v-select>
             </v-col>
-            <v-col cols="4">
-                <v-btn color="primary" @click="generatePatientReport" :disabled="!selectedPatient">
+            <v-col cols="3">
+                <v-text-field
+                    v-model="fechaDesde"
+                    label="Fecha Desde"
+                    type="date"
+                    outlined
+                ></v-text-field>
+            </v-col>
+            <v-col cols="3">
+                <v-text-field
+                    v-model="fechaHasta"
+                    label="Fecha Hasta"
+                    type="date"
+                    outlined
+                ></v-text-field>
+            </v-col>
+            <v-col cols="2">
+                <v-btn color="primary" @click="generateExamenReport" :disabled="!selectedPatient || !fechaDesde || !fechaHasta">
                     Generar Reporte
                 </v-btn>
             </v-col>
@@ -26,7 +42,7 @@
         <!-- Modal para mostrar el PDF -->
         <v-dialog v-model="showPdfDialog" max-width="1200px">
             <v-card>
-                <v-card-title class="headline">Expediente Médico</v-card-title>
+                <v-card-title class="headline">Reporte de Exámenes</v-card-title>
                 <v-card-text>
                     <iframe
                         v-if="pdfUrl"
@@ -56,16 +72,18 @@ import axios from 'axios';
 const router = useRouter();
 const isMini = ref(true);
 const patientsOptions = ref([]);
-const selectedPatient = ref(null); // Almacena el ID del paciente seleccionado
-const pdfUrl = ref(null); // URL temporal para el PDF
-const showPdfDialog = ref(false); // Controla la visibilidad del modal
+const selectedPatient = ref(null);
+const fechaDesde = ref(null);
+const fechaHasta = ref(null);
+const pdfUrl = ref(null);
+const showPdfDialog = ref(false);
 
-// Cargar la lista de pacientes
+// Cargar pacientes
 async function loadPatients() {
     try {
         const response = await pacientesService.obtenerPacientes();
         patientsOptions.value = response.map(paciente => ({
-            paciente_id: paciente.id_paciente, 
+            paciente_id: paciente.id_paciente,
             pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre'
         }));
     } catch (error) {
@@ -73,26 +91,27 @@ async function loadPatients() {
     }
 }
 
-// Función para generar el reporte del paciente seleccionado
-async function generatePatientReport() {
-    if (!selectedPatient.value) {
-        alert("Seleccione un paciente");
+// Generar reporte de exámenes
+async function generateExamenReport() {
+    if (!selectedPatient.value || !fechaDesde.value || !fechaHasta.value) {
+        alert("Seleccione un paciente y un rango de fechas válido.");
         return;
     }
 
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/reportes/expediente/${selectedPatient.value}`, {
-            responseType: 'blob' // Recibir el archivo PDF como blob
+        const response = await axios.get(`http://127.0.0.1:8000/api/reportes/examenes/${selectedPatient.value}`, {
+            params: {
+                fecha_desde: fechaDesde.value,
+                fecha_hasta: fechaHasta.value,
+            },
+            responseType: 'blob'
         });
 
-        // Crear una URL temporal para el blob
         pdfUrl.value = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-
-        // Mostrar el modal con el PDF
         showPdfDialog.value = true;
     } catch (error) {
         console.error("Error al generar reporte:", error);
-        alert("Error al generar el reporte del paciente.");
+        alert("Error al generar el reporte de exámenes.");
     }
 }
 
@@ -100,7 +119,7 @@ async function generatePatientReport() {
 onMounted(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-        loadPatients(); // Cargar los pacientes cuando se monta el componente
+        loadPatients();
     } else {
         router.push({ name: 'Login' });
     }

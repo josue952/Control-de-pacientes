@@ -11,6 +11,7 @@ use App\Http\Controllers\ConsultasController;
 use App\Http\Controllers\RecetasController;
 use App\Http\Controllers\ExamenesController;
 use App\Http\Controllers\MedicamentosController;
+use App\Http\Controllers\ReportController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -100,10 +101,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rutas para Medicamentos
     Route::prefix('medicamentos')->group(function () {
-    Route::get('/', [MedicamentosController::class, 'index']); // Listar todos los medicamentos
-    Route::post('/', [MedicamentosController::class, 'store']); // Crear un nuevo medicamento
-    Route::get('/{id}', [MedicamentosController::class, 'show']); // Mostrar un medicamento específico por ID
-    Route::put('/{id}', [MedicamentosController::class, 'update']); // Actualizar un medicamento específico por ID
-    Route::delete('/{id}', [MedicamentosController::class, 'destroy']); // Eliminar un medicamento específico por ID
-});
+        Route::get('/', [MedicamentosController::class, 'index']); // Listar todos los medicamentos
+        Route::post('/', [MedicamentosController::class, 'store']); // Crear un nuevo medicamento
+        Route::get('/{id}', [MedicamentosController::class, 'show']); // Mostrar un medicamento específico por ID
+        Route::put('/{id}', [MedicamentosController::class, 'update']); // Actualizar un medicamento específico por ID
+        Route::delete('/{id}', [MedicamentosController::class, 'destroy']); // Eliminar un medicamento específico por ID
+    });
+
+    //Ruta para generar reportes
+
+    //Reportes para pacientes
+    Route::get('/reportes/expediente/{paciente_id}', [ReportController::class, 'generarExpedientePaciente']);
+    // Ruta para generar el reporte de recetas de un paciente por rango de fechas
+    Route::get('/reportes/recetas/{paciente_id}', [ReportController::class, 'generarRecetasPaciente']);
+    // Ruta para generar el reporte de exámenes de un paciente por rango de fechas
+    Route::get('reportes/examenes/{paciente_id}', [ReportController::class, 'generarExamenesPaciente']);
+    // Ruta para generar el reporte de consultas de un doctor
+    Route::get('reportes/consultas/doctor/{doctor_id}', [ReportController::class, 'generarConsultasPorDoctor']);    
 });

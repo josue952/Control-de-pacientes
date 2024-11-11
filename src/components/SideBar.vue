@@ -43,7 +43,7 @@ export default {
     data() {
         return {
             drawer: true,
-            drawerWidth: 190,
+            drawerWidth: 180,
             miniDrawerWidth: 70,
             showReportsSubMenu: false, // Controla la visibilidad del submenú de reportes
             items: [
@@ -59,10 +59,10 @@ export default {
                 { title: 'Reportes', icon: 'mdi-chart-bar', to: null } // Nuevo ítem de "Reportes"
             ],
             reportItems: [ // Subreportes dentro de Reportes
-                { title: 'Paciente', icon: 'mdi-file-chart', to: '/reportes/usuarios' },
-                { title: 'Recetas', icon: 'mdi-file-chart', to: '/reportes/pacientes' },
-                { title: 'Examenes', icon: 'mdi-file-chart', to: '/reportes/doctores' },
-                { title: 'Consultas', icon: 'mdi-file-chart', to: '/reportes/citas' }
+                { title: 'Pacientes', icon: 'mdi-file-chart', to: '/reporte-paciente' },
+                { title: 'Recetas', icon: 'mdi-file-chart', to: '/reporte-receta' },
+                { title: 'Examenes', icon: 'mdi-file-chart', to: '/reporte-examenes' },
+                { title: 'Consultas', icon: 'mdi-file-chart', to: '/reporte-consultas' }
             ]
         };
     },
@@ -105,6 +105,6 @@ export default {
 }
 
 .sub-menu {
-    padding-left: 20px; /* Aumenta el margen para indicar que es un submenú */
+    padding-left: 10px; /* Aumenta el margen para indicar que es un submenú */
 }
 </style>

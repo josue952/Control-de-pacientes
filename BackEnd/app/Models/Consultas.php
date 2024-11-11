@@ -41,9 +41,8 @@ class Consultas extends Model
         return $this->belongsTo(Doctores::class, 'doctor_id', 'id_doctor');
     }
 
-    // Relación opcional con la tabla Examenes
     public function examen()
     {
-        return $this->belongsTo(Examenes::class, 'examen_id', 'id_examen')->nullable();
+        return $this->belongsTo(Examenes::class, 'examen_id', 'id_examen')->withDefault();
     }
 }
