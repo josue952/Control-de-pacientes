@@ -11,6 +11,10 @@
                     <v-list-item-content v-if="!isMini">
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item-content>
+                    <!-- Flecha condicional en el ítem de "Reportes" -->
+                    <v-icon v-if="item.title === 'Reportes'" class="icon-toggle">
+                        {{ showReportsSubMenu ? 'mdi-chevron-down' : 'mdi-chevron-up' }}
+                    </v-icon>
                 </div>
             </v-list-item>
 
@@ -59,10 +63,10 @@ export default {
                 { title: 'Reportes', icon: 'mdi-chart-bar', to: null } // Nuevo ítem de "Reportes"
             ],
             reportItems: [ // Subreportes dentro de Reportes
-                { title: 'Pacientes', icon: 'mdi-file-chart', to: '/reporte-paciente' },
-                { title: 'Recetas', icon: 'mdi-file-chart', to: '/reporte-receta' },
-                { title: 'Examenes', icon: 'mdi-file-chart', to: '/reporte-examenes' },
-                { title: 'Consultas', icon: 'mdi-file-chart', to: '/reporte-consultas' }
+                { title: 'Expedientes', icon: 'mdi-folder-account', to: '/reporte-paciente' },
+                { title: 'Recetas', icon: 'mdi-text-box-check-outline', to: '/reporte-receta' },
+                { title: 'Examenes', icon: 'mdi-clipboard-pulse-outline', to: '/reporte-examenes' },
+                { title: 'Consultas', icon: 'mdi-calendar-range', to: '/reporte-consultas' }
             ]
         };
     },
