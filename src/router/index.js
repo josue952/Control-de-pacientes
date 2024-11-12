@@ -9,6 +9,11 @@ import PagosView from '@/views/PagosView.vue'
 import ConsultasView from '@/views/ConsultasView.vue'
 import MedicamentosView from '@/views/MedicamentosView.vue'
 import RecetasView from '@/views/RecetasView.vue'
+// Importar las vistas de los reportes
+import ReportePaciente from '@/views/Reportes/ReportePaciente.vue'
+import ReporteReceta from '@/views/Reportes/ReporteReceta.vue'
+import ReporteExamenes from '@/views/Reportes/ReporteExamenes.vue'
+import ReporteConsultas from '@/views/Reportes/ReporteConsultas.vue'
 
 const routes = [
   {
@@ -68,6 +73,31 @@ const routes = [
     path: '/recetas',
     name: 'Recetas',
     component: RecetasView,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  //Rutas para los reportes
+  {
+    path: '/reporte-paciente',
+    name: 'ReportePaciente',
+    component: ReportePaciente,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/reporte-receta',
+    name: 'ReporteReceta',
+    component: ReporteReceta,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/reporte-examenes',
+    name: 'ReporteExamenes',
+    component: ReporteExamenes,
+    meta: { requiresAuth: true } // Requiere autenticación
+  },
+  {
+    path: '/reporte-consultas',
+    name: 'ReporteConsultas',
+    component: ReporteConsultas,
     meta: { requiresAuth: true } // Requiere autenticación
   }
 ]

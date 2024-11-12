@@ -30,7 +30,7 @@
                     <td class="action-buttons">
                         <div class="d-flex justify-center">
                             <v-btn size="small" color="primary" class="mx-1" @click="editMedicamento(item)">Editar</v-btn>
-                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteMedicamento(item)">Eliminar</v-btn>
+                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteMedicamento(item)" :disabled="userRole === 'Paciente'">Eliminar</v-btn>
                         </div>
                     </td>
                 </tr>
@@ -118,6 +118,9 @@ const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
 const dialogAction = ref(null);
+
+// Obtener rol del usuario y paciente actual de localStorage
+const userRole = localStorage.getItem('user_role');
 
 const tableHeaders = [
     { title: 'Nombre', align: 'start', key: 'nombre', width: '150px' },

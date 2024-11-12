@@ -7,7 +7,7 @@
         <!-- Barra superior con botón Agregar, Buscador, y Filtro de Género -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="4">
-                <v-btn color="primary" @click="showAddPacienteDialog">Agregar Paciente</v-btn>
+                <v-btn color="primary" @click="showAddPacienteDialog" :disabled="userRole === 'Paciente'">Agregar Paciente</v-btn>
             </v-col>
             <v-col cols="4">
                 <v-text-field v-model="search" label="Buscar por nombre" prepend-icon="mdi-magnify"
@@ -33,10 +33,10 @@
                     <td>{{ formatDate(item.fecha_registro) }}</td>
                     <td class="action-buttons">
                         <div class="d-flex justify-center">
-                            <v-btn size="small" color="primary" class="mx-1" @click="editPaciente(item)">
+                            <v-btn size="small" color="primary" class="mx-1" @click="editPaciente(item)" :disabled="userRole === 'Paciente'">
                                 Editar
                             </v-btn>
-                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeletePaciente(item)">
+                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeletePaciente(item)" :disabled="userRole === 'Doctor' || userRole === 'Paciente'">
                                 Eliminar
                             </v-btn>
                         </div>
@@ -125,6 +125,9 @@ const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
 const dialogAction = ref(null);
+
+//obtener el rol del usuario por medio del local storage
+const userRole = localStorage.getItem('user_role');
 
 const filteredPacientes = computed(() => {
     return (pacientes.value || [])

@@ -25,7 +25,6 @@
                     </v-list-item-icon>
                 </v-list-item>
             </template>
-
         </v-menu>
 
         <!-- Diálogo de confirmación de cierre de sesión -->
@@ -52,8 +51,8 @@ export default {
         return {
             userName: '',
             userEmail: '',
-            userAvatar: null, // URL para el avatar del usuario si existe
-            showLogoutDialog: false // Controla la visibilidad del diálogo de cierre de sesión
+            userAvatar: null,
+            showLogoutDialog: false,
         };
     },
     computed: {
@@ -73,8 +72,13 @@ export default {
                         this.userName = user.nombre_completo;
                         this.userEmail = user.email;
                         this.userAvatar = user.avatar || null;
+
+                        // Guardar el rol del usuario en localStorage
+                        localStorage.setItem('user_role', user.Rol);
+                        
+                        // Guardar el id del usuario en localStorage
+                        localStorage.setItem('user_id', user.id_usuario);
                     }
-                    console.log("Datos del usuario cargados:", user);
                 } catch (error) {
                     console.error("Error al obtener los datos del usuario:", error);
                 }
@@ -90,9 +94,10 @@ export default {
                 console.error("Error al cerrar sesión en el backend:", error);
             }
 
-            // Eliminar token y correo electrónico del localStorage
+            // Eliminar token, correo electrónico y rol del usuario del localStorage
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_email');
+            localStorage.removeItem('user_role');
 
             // Redirigir al usuario a la página de inicio de sesión
             this.$router.push({ name: 'Login' });
@@ -105,15 +110,13 @@ export default {
 </script>
 
 <style scoped>
-.headline{
+.headline {
     text-align: center;
 }
 
 .large-btn {
     font-size: 18px;
-    /* Aumenta el tamaño de fuente del botón */
     padding: 10px 16px;
-    /* Aumenta el padding del botón */
 }
 
 .user-info {
@@ -123,15 +126,11 @@ export default {
 
 .user-name {
     font-size: 16px;
-    /* Tamaño de fuente para el nombre del usuario */
     font-weight: 500;
 }
 
 .user-email {
     font-size: 14px;
-    /* Tamaño de fuente para el correo electrónico */
     color: rgba(255, 255, 255, 0.7);
-    /* Color más claro para el correo */
 }
-
 </style>

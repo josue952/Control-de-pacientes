@@ -7,7 +7,7 @@
         <!-- Barra superior con botón Agregar y filtros -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="4">
-                <v-btn color="primary" @click="showAddConsultaDialog">Agregar Consulta</v-btn>
+                <v-btn color="primary" @click="showAddConsultaDialog" >Agregar Consulta</v-btn>
             </v-col>
             <v-col cols="4">
                 <v-select v-model="selectedPaciente" :items="pacientesOptions" label="Filtrar por Paciente"
@@ -39,7 +39,7 @@
                         <div class="d-flex justify-center">
                             <v-btn size="small" color="primary" class="mx-1" @click="editConsulta(item)">Editar</v-btn>
                             <v-btn size="small" color="error" class="mx-1"
-                                @click="confirmDeleteConsulta(item)">Eliminar</v-btn>
+                                @click="confirmDeleteConsulta(item)" :disabled="userRole === 'Paciente' || userRole === 'Doctor'">Eliminar</v-btn>
                         </div>
                     </td>
                 </tr>
@@ -76,7 +76,7 @@
 
                         <!-- Select de Examen -->
                         <v-select :items="examenes" v-model="editedConsulta.examen_id" label="Examen"
-                            item-title="nombre" item-value="id_examen" @change="updateExamenId">
+                            item-title="nombre" item-value="id_examen" @change="updateExamenId" :disabled="userRole === 'Paciente'">
                             <template #item="{ item }">
                                 <div class="d-flex justify-space-between align-center">
                                     <span style="margin-left: 15px;">{{ item.value ? `Examen N° ${item.value}` : "Sin Examen" }}</span>
@@ -196,6 +196,9 @@ const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
 const dialogAction = ref(null);
+
+// Obtener rol del usuario y paciente actual de localStorage
+const userRole = localStorage.getItem('user_role');
 
 const tableHeaders = [
     { title: 'ID de Cita', align: 'start', key: 'cita_id', width: '150px' },
