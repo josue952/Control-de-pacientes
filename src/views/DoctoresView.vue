@@ -7,7 +7,7 @@
         <!-- Barra superior con botón Agregar, Buscador, y Filtro de Especialidad -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="4">
-                <v-btn color="primary" @click="showAddDoctorDialog">Agregar Doctor</v-btn>
+                <v-btn color="primary" @click="showAddDoctorDialog" :disabled="userRole === 'Paciente'">Agregar Doctor</v-btn>
             </v-col>
             <v-col cols="4">
                 <v-text-field v-model="search" label="Buscar por nombre" prepend-icon="mdi-magnify"
@@ -29,10 +29,10 @@
                     <td>{{ item.telefono }}</td>
                     <td class="action-buttons">
                         <div class="d-flex justify-center">
-                            <v-btn size="small" color="primary" class="mx-1" @click="editDoctor(item)">
+                            <v-btn size="small" color="primary" class="mx-1" @click="editDoctor(item)" :disabled="userRole === 'Paciente'">
                                 Editar
                             </v-btn>
-                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteDoctor(item)">
+                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteDoctor(item)" :disabled="userRole === 'Doctor' || userRole === 'Paciente'">
                                 Eliminar
                             </v-btn>
                         </div>
@@ -134,6 +134,9 @@ const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
 const dialogAction = ref(null);
+
+//obtener el rol del usuario por medio del local storage
+const userRole = localStorage.getItem('user_role');
 
 // Especialidades para el filtro incluyendo la opción "Todos"
 const especialidadesWithAllOption = computed(() => ["Todos", ...especialidadesFiltro.value]);

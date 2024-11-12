@@ -14,6 +14,7 @@
                     item-title="pacienteNombre"
                     item-value="paciente_id"
                     outlined
+                    :disabled="isPatientRole"
                 ></v-select>
             </v-col>
             <v-col cols="3">
@@ -78,20 +79,32 @@ const fechaHasta = ref(null);
 const pdfUrl = ref(null);
 const showPdfDialog = ref(false);
 
-// Cargar pacientes
+// Obtener rol y usuario actual
+const userRole = localStorage.getItem('user_role');
+const userId = localStorage.getItem('user_id');
+const isPatientRole = userRole === 'Paciente';
+
 async function loadPatients() {
     try {
         const response = await pacientesService.obtenerPacientes();
         patientsOptions.value = response.map(paciente => ({
             paciente_id: paciente.id_paciente,
-            pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre'
+            pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre',
+            usuario_id: paciente.usuario_id
         }));
+
+        // Si el usuario es paciente, seleccionar automáticamente su paciente_id
+        if (isPatientRole && userId) {
+            const paciente = patientsOptions.value.find(p => p.usuario_id === parseInt(userId));
+            if (paciente) {
+                selectedPatient.value = paciente.paciente_id;
+            }
+        }
     } catch (error) {
         console.error("Error al cargar pacientes:", error);
     }
 }
 
-// Generar reporte de exámenes
 async function generateExamenReport() {
     if (!selectedPatient.value || !fechaDesde.value || !fechaHasta.value) {
         alert("Seleccione un paciente y un rango de fechas válido.");
@@ -115,7 +128,6 @@ async function generateExamenReport() {
     }
 }
 
-// Cargar pacientes al montar el componente
 onMounted(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {

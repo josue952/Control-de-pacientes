@@ -45,7 +45,7 @@
                     <td class="action-buttons">
                         <div class="d-flex justify-center">
                             <v-btn size="small" color="primary" class="mx-1" @click="editCita(item)">Editar</v-btn>
-                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteCita(item)">Eliminar</v-btn>
+                            <v-btn size="small" color="error" class="mx-1" @click="confirmDeleteCita(item)" :disabled="userRole === 'Doctor' || userRole === 'Paciente'">Eliminar</v-btn>
                         </div>
                     </td>
                 </tr>
@@ -60,8 +60,16 @@
                 </v-card-title>
                 <v-card-text>
                     <v-form ref="form" v-model="valid">
-                        <v-select :items="pacientes" item-value="id_paciente" item-title="nombre_completo"
-                            label="Seleccione un Paciente" v-model="editedCita.paciente_id" :disabled="editMode" required></v-select>
+                        <!-- Selector de Paciente -->
+                        <v-select 
+                            :items="pacientes" 
+                            item-value="id_paciente" 
+                            item-title="nombre_completo"
+                            label="Seleccione un Paciente" 
+                            v-model="editedCita.paciente_id" 
+                            :disabled="isPatientRole" 
+                            required
+                        ></v-select>
 
                         <v-select :items="doctores" item-value="id_doctor" item-title="nombre_completo"
                             label="Seleccione un Doctor" v-model="editedCita.doctor_id" :disabled="editMode" required></v-select>
@@ -69,14 +77,13 @@
                         <v-text-field v-model="editedCita.fecha_cita" label="Fecha de la Cita" type="date"
                             required></v-text-field>
 
-                        <!-- Campo de Hora de la Cita en formato de 12 horas -->
                         <v-text-field v-model="editedCita.hora_cita" label="Hora de la Cita" type="time"
                             required></v-text-field>
 
                         <v-text-field v-model="editedCita.motivo_consulta" label="Motivo de Consulta" type="text"></v-text-field>
 
                         <v-select :items="['Pendiente', 'Completada', 'Cancelada']" v-model="editedCita.estado"
-                            label="Estado" :disabled="!editMode" required></v-select>
+                            label="Estado" :disabled="!editMode || userRole === 'Paciente'" required></v-select>
 
                         <v-text-field 
                             v-model="editedCita.monto_consulta" 
@@ -84,7 +91,7 @@
                             type="number" 
                             min="0" 
                             required
-                            :disabled="!editMode || editedCita.pagada" 
+                            :disabled="!editMode || editedCita.pagada || userRole === 'Paciente'" 
                             :value="editMode ? editedCita.monto_consulta : 0">
                         </v-text-field>
 
@@ -121,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted} from 'vue';
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SideBar from "@/components/SideBar.vue";
 import citasService from "@/services/citasService";
@@ -143,11 +150,15 @@ const doctores = ref([]);
 const filterPagada = ref("Todos");
 const filterEstado = ref("Todos");
 
-
 const dynamicDialog = ref(false);
 const dialogMessage = ref("");
 const dialogType = ref("alert");
 const dialogAction = ref(null);
+
+// Obtener rol del usuario y paciente actual de localStorage
+const userRole = localStorage.getItem('user_role');
+const userId = localStorage.getItem('user_id');
+const isPatientRole = userRole === 'Paciente';
 
 const tableHeaders = [
     { title: 'Paciente', align: 'center', key: 'paciente.nombre_completo', width: '220px' },
@@ -211,12 +222,18 @@ async function handleDialogAction() {
 
 async function getPacientes() {
     const response = await pacientesService.obtenerPacientes();
-    // Mapear los pacientes para incluir `nombre_completo`
     pacientes.value = response.map(paciente => ({
         ...paciente,
         nombre_completo: paciente.usuario?.nombre_completo || "Sin nombre"
     }));
-    console.log('Pacientes cargados:', pacientes.value);
+
+    // Si el usuario es paciente, encontrar y establecer automáticamente su `paciente_id`
+    if (isPatientRole && userId) {
+        const paciente = pacientes.value.find(p => p.usuario_id === parseInt(userId));
+        if (paciente) {
+            editedCita.value.paciente_id = paciente.id_paciente;
+        }
+    }
 }
 
 async function getDoctores() {
@@ -271,17 +288,18 @@ function toggleDrawer() {
 
 function showAddCitaDialog() {
     editMode.value = false;
+    // Mantener paciente_id si el usuario es paciente
     editedCita.value = {
-        paciente_id: "",
+        paciente_id: isPatientRole ? editedCita.value.paciente_id : "",
         doctor_id: "",
         fecha_cita: "",
         hora_cita: "",
         motivo_consulta: "",
         estado: "Pendiente",
-        monto_consulta: 0, // Valor predeterminado de 0
+        monto_consulta: 0,
         pagada: false
     };
-    dialog.value = true;
+    dialog.value = true; // Abre el diálogo
 }
 
 function editCita(cita) {

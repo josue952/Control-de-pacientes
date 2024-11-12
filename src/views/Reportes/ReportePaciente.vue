@@ -14,6 +14,7 @@
                     item-title="pacienteNombre"
                     item-value="paciente_id"
                     outlined
+                    :disabled="isPatientRole"
                 ></v-select>
             </v-col>
             <v-col cols="4">
@@ -60,14 +61,28 @@ const selectedPatient = ref(null); // Almacena el ID del paciente seleccionado
 const pdfUrl = ref(null); // URL temporal para el PDF
 const showPdfDialog = ref(false); // Controla la visibilidad del modal
 
+// Obtener rol del usuario y usuario actual desde localStorage
+const userRole = localStorage.getItem('user_role');
+const userId = localStorage.getItem('user_id');
+const isPatientRole = userRole === 'Paciente';
+
 // Cargar la lista de pacientes
 async function loadPatients() {
     try {
         const response = await pacientesService.obtenerPacientes();
         patientsOptions.value = response.map(paciente => ({
             paciente_id: paciente.id_paciente, 
-            pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre'
+            pacienteNombre: paciente.usuario?.nombre_completo || 'Sin nombre',
+            usuario_id: paciente.usuario_id
         }));
+
+        // Si el usuario es paciente, seleccionar automáticamente su paciente_id
+        if (isPatientRole && userId) {
+            const paciente = patientsOptions.value.find(p => p.usuario_id === parseInt(userId));
+            if (paciente) {
+                selectedPatient.value = paciente.paciente_id;
+            }
+        }
     } catch (error) {
         console.error("Error al cargar pacientes:", error);
     }

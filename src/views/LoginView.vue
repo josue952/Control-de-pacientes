@@ -59,7 +59,6 @@ export default {
         showPassword: false,
         showErrorDialog: false // Controla la visibilidad del diálogo de error
     }),
-
     methods: {
         async login() {
             if (this.$refs.form.validate()) {
@@ -74,6 +73,10 @@ export default {
 
                     // Guarda el correo electrónico en el localStorage
                     localStorage.setItem('user_email', this.email);
+
+                    // Guarda el rol en el localStorage
+                    const userRole = response.data.role; // Asegúrate de que el backend envíe el rol
+                    localStorage.setItem('user_role', userRole);
 
                     // Redirige al usuario al Dashboard
                     this.$router.push({ name: 'Usuarios' });

@@ -7,7 +7,7 @@
         <!-- Barra superior con botón Agregar, Buscador y Filtro de Rol -->
         <v-row class="d-flex align-center mb-4 mt-4">
             <v-col cols="4">
-                <v-btn color="primary" @click="showAddUserDialog">Agregar Usuario</v-btn>
+                <v-btn color="primary" @click="showAddUserDialog" :disabled="userRole === 'Paciente'">Agregar Usuario</v-btn>
             </v-col>
             <v-col cols="4">
                 <v-text-field v-model="search" label="Buscar por nombre" prepend-icon="mdi-magnify"
@@ -32,10 +32,10 @@
                     <td>{{ formatDate(item.Fecha_registro) }}</td>
                     <td class="action-buttons">
                         <div class="d-flex justify-center">
-                            <v-btn size="small" color="primary" class="mx-1 my-1" @click="editUser(item)">
+                            <v-btn size="small" color="primary" class="mx-1 my-1" @click="editUser(item)" :disabled="userRole === 'Paciente'">
                                 Editar
                             </v-btn>
-                            <v-btn size="small" color="error" class="mx-1 my-1" @click="confirmDeleteUser(item)">
+                            <v-btn size="small" color="error" class="mx-1 my-1" @click="confirmDeleteUser(item)" :disabled="userRole === 'Doctor' || userRole === 'Paciente'">
                                 Eliminar
                             </v-btn>
                         </div>
@@ -69,7 +69,9 @@
                             :type="showPassword ? 'text' : 'password'"
                             :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                             @click:append="togglePasswordVisibility" :rules="[rules.password]"
-                            :required="!editMode"></v-text-field>
+                            :required="!editMode"
+                            :disabled="userRole === 'Doctor' || userRole === 'Paciente' && editMode"
+                            ></v-text-field>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
@@ -104,12 +106,15 @@ import SideBar from "@/components/SideBar.vue";
 import usuariosService from "@/services/usuariosService";
 import { useRouter } from 'vue-router';
 
+//obtener el rol del usuario por medio del local storage
+const userRole = localStorage.getItem('user_role');
+
 const router = useRouter();
 const isMini = ref(true);
 const search = ref("");
 const selectedRole = ref("Todos");
 const rolesForFilter = ["Todos", "Administrador", "Paciente", "Doctor"];
-const rolesForForm = ["Administrador", "Paciente", "Doctor"]; // Sin "Todos"
+const rolesForForm = ["Paciente", "Doctor"]; // Sin "Todos"
 const dialog = ref(false);
 const editMode = ref(false);
 const editedUser = ref({});
@@ -284,8 +289,6 @@ function confirmDeleteUser(user) {
         }
     );
 }
-
-
 
 function closeDialog() {
     dialog.value = false;

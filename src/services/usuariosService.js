@@ -70,7 +70,7 @@ const usuariosService = {
     // Método para cerrar sesión
     async cerrarSesion() {
         try {
-            await axios.post("/api/logout");
+            await axios.get("/api/logout");
         } catch (error) {
             console.error("Error al cerrar sesión en el backend:", error);
             throw error;
